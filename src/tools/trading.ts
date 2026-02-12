@@ -59,11 +59,11 @@ export function registerTradingTools(server: McpServer, client: EtoroClient): vo
     },
     withErrorHandling(async (args) => {
       const body: Record<string, unknown> = {
-        InstrumentId: args.instrumentId,
+        InstrumentID: args.instrumentId,
         Amount: args.amount,
         IsBuy: args.isBuy,
+        Leverage: args.leverage ?? 1,
       };
-      if (args.leverage !== undefined) body.Leverage = args.leverage;
       if (args.stopLossRate !== undefined) body.StopLossRate = args.stopLossRate;
       if (args.takeProfitRate !== undefined) body.TakeProfitRate = args.takeProfitRate;
 
@@ -87,11 +87,11 @@ export function registerTradingTools(server: McpServer, client: EtoroClient): vo
     },
     withErrorHandling(async (args) => {
       const body: Record<string, unknown> = {
-        InstrumentId: args.instrumentId,
-        Units: args.units,
+        InstrumentID: args.instrumentId,
+        AmountInUnits: args.units,
         IsBuy: args.isBuy,
+        Leverage: args.leverage ?? 1,
       };
-      if (args.leverage !== undefined) body.Leverage = args.leverage;
       if (args.stopLossRate !== undefined) body.StopLossRate = args.stopLossRate;
       if (args.takeProfitRate !== undefined) body.TakeProfitRate = args.takeProfitRate;
 
@@ -130,12 +130,12 @@ export function registerTradingTools(server: McpServer, client: EtoroClient): vo
     },
     withErrorHandling(async (args) => {
       const body: Record<string, unknown> = {
-        InstrumentId: args.instrumentId,
+        InstrumentID: args.instrumentId,
         Amount: args.amount,
         IsBuy: args.isBuy,
         Rate: args.rate,
+        Leverage: args.leverage ?? 1,
       };
-      if (args.leverage !== undefined) body.Leverage = args.leverage;
       if (args.stopLossRate !== undefined) body.StopLossRate = args.stopLossRate;
       if (args.takeProfitRate !== undefined) body.TakeProfitRate = args.takeProfitRate;
 

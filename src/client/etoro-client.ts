@@ -60,13 +60,13 @@ export class EtoroClient {
 
     const response = await fetch(url, { ...options, headers });
 
+    const text = await response.text();
+
     if (!response.ok) {
-      let body: unknown;
+      let body: unknown = text;
       try {
-        body = await response.json();
-      } catch {
-        body = await response.text();
-      }
+        body = JSON.parse(text);
+      } catch { /* keep as raw text */ }
       throw new EtoroApiError(
         `Request failed: ${response.status} ${response.statusText}`,
         response.status,
@@ -74,7 +74,6 @@ export class EtoroClient {
       );
     }
 
-    const text = await response.text();
     if (!text) return undefined as T;
 
     try {
