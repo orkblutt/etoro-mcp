@@ -104,13 +104,25 @@ export function registerTradingTools(server: McpServer, client: EtoroClient): vo
   // 3. close_position
   server.tool(
     "close_position",
-    "Close an open position by its position ID",
+    "Close an open position by its position ID. Requires the instrument ID of the position.",
     {
       positionId: z.number().describe("The position ID to close"),
+      instrumentId: z.number().optional().describe("The instrument ID of the position (if omitted, will be looked up from portfolio)"),
     },
     withErrorHandling(async (args) => {
+      let instrumentId = args.instrumentId;
+      if (instrumentId === undefined) {
+        // Look up from portfolio
+        const infoPath = client.infoPath("/portfolio");
+        const portfolio = await client.get<PortfolioResponse>(infoPath);
+        const pos = portfolio.clientPortfolio.positions.find(
+          (p) => p.positionID === args.positionId
+        );
+        if (!pos) throw new Error(`Position ${args.positionId} not found in portfolio`);
+        instrumentId = pos.instrumentID as number;
+      }
       const path = client.executionPath(`/market-close-orders/positions/${args.positionId}`);
-      const data = await client.post(path, { UnitsToDeduct: null });
+      const data = await client.post(path, { InstrumentID: instrumentId, UnitsToDeduct: null });
       return formatToolResponse(data);
     })
   );
