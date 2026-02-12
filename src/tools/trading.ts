@@ -188,27 +188,16 @@ export function registerTradingTools(server: McpServer, client: EtoroClient): vo
   server.tool(
     "get_portfolio",
     "Get the current user's portfolio (all open positions)",
-    {
-      page: z.number().optional().describe("Page number (default 1)"),
-      pageSize: z.number().optional().describe("Positions per page (default 50)"),
-    },
-    withErrorHandling(async (args) => {
+    {},
+    withErrorHandling(async () => {
       const path = client.infoPath("/portfolio");
       const data = await client.get<PortfolioResponse>(path);
       const trimmed = trimPortfolio(data);
-      const page = args.page || 1;
-      const size = args.pageSize || 50;
-      const start = (page - 1) * size;
-      const paged = trimmed.positions.slice(start, start + size);
       return formatToolResponse({
         credit: trimmed.credit,
         bonusCredit: trimmed.bonusCredit,
         positionCount: trimmed.positionCount,
-        page,
-        pageSize: size,
-        totalPages: Math.ceil(trimmed.positionCount / size),
-        positions: paged,
-        pendingOrders: trimmed.pendingOrders,
+        positions: trimmed.positions,
       });
     })
   );
