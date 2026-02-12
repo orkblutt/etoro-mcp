@@ -3,6 +3,47 @@ import { z } from "zod";
 import { EtoroClient } from "../client/etoro-client.js";
 import { formatToolResponse, withErrorHandling } from "../utils/errors.js";
 
+interface PortfolioResponse {
+  clientPortfolio: {
+    credit: number;
+    bonusCredit: number;
+    positions: Array<Record<string, unknown>>;
+    orders: unknown[];
+    stockOrders: unknown[];
+    entryOrders: unknown[];
+    ordersForOpen: unknown[];
+    ordersForClose: unknown[];
+    mirrors: unknown[];
+  };
+}
+
+function trimPortfolio(data: PortfolioResponse) {
+  const p = data.clientPortfolio;
+  return {
+    credit: p.credit,
+    bonusCredit: p.bonusCredit,
+    positionCount: p.positions.length,
+    positions: p.positions.map((pos) => ({
+      positionID: pos.positionID,
+      instrumentID: pos.instrumentID,
+      isBuy: pos.isBuy,
+      amount: pos.amount,
+      units: pos.units,
+      leverage: pos.leverage,
+      openRate: pos.openRate,
+      openDateTime: pos.openDateTime,
+      stopLossRate: pos.stopLossRate,
+      takeProfitRate: pos.takeProfitRate,
+    })),
+    pendingOrders: [
+      ...p.orders || [],
+      ...p.stockOrders || [],
+      ...p.entryOrders || [],
+      ...p.ordersForOpen || [],
+    ],
+  };
+}
+
 export function registerTradingTools(server: McpServer, client: EtoroClient): void {
   // 1. open_position_by_amount
   server.tool(
@@ -125,8 +166,9 @@ export function registerTradingTools(server: McpServer, client: EtoroClient): vo
     {},
     withErrorHandling(async () => {
       const path = client.infoPath("/portfolio");
-      const data = await client.get(path);
-      return formatToolResponse(data);
+      const data = await client.get<PortfolioResponse>(path);
+      const trimmed = trimPortfolio(data);
+      return formatToolResponse(trimmed.pendingOrders);
     })
   );
 
@@ -134,11 +176,28 @@ export function registerTradingTools(server: McpServer, client: EtoroClient): vo
   server.tool(
     "get_portfolio",
     "Get the current user's portfolio (all open positions)",
-    {},
-    withErrorHandling(async () => {
+    {
+      page: z.number().optional().describe("Page number (default 1)"),
+      pageSize: z.number().optional().describe("Positions per page (default 50)"),
+    },
+    withErrorHandling(async (args) => {
       const path = client.infoPath("/portfolio");
-      const data = await client.get(path);
-      return formatToolResponse(data);
+      const data = await client.get<PortfolioResponse>(path);
+      const trimmed = trimPortfolio(data);
+      const page = args.page || 1;
+      const size = args.pageSize || 50;
+      const start = (page - 1) * size;
+      const paged = trimmed.positions.slice(start, start + size);
+      return formatToolResponse({
+        credit: trimmed.credit,
+        bonusCredit: trimmed.bonusCredit,
+        positionCount: trimmed.positionCount,
+        page,
+        pageSize: size,
+        totalPages: Math.ceil(trimmed.positionCount / size),
+        positions: paged,
+        pendingOrders: trimmed.pendingOrders,
+      });
     })
   );
 }
