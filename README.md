@@ -2,6 +2,158 @@
 
 MCP server that wraps the [eToro public API](https://public-api.etoro.com/api/v1), exposing 34 tools for AI assistants (Claude Desktop, Cursor, Claude Code, etc.).
 
+## What Can You Do With It?
+
+Below are real conversations with an AI assistant connected to the eToro MCP server.
+
+### Place a limit order
+
+> **You:** Place a buy limit order for 5 SOL if it reaches $75
+
+The assistant searches for the Solana instrument, fetches the current rate, and places the order:
+
+> **Assistant:** Current SOL price is $78.21. I've placed a buy limit order for 5 SOL at $75 ($375 total) with a stop loss at $1. Order confirmed.
+
+---
+
+### DCA ladder based on technical analysis
+
+> **You:** Can you place some DCA buy limit orders for ETH based on key support levels?
+
+The assistant analyzes daily/weekly candle data, identifies support zones, and asks for your budget:
+
+> **Assistant:** Based on the chart, here are the key support levels for ETH:
+> - $1,750 — first support zone
+> - $1,500 — strong horizontal support
+> - $1,200 — macro support
+> - $1,000 — psychological floor
+>
+> I've placed 4 limit orders:
+> | Level | Amount | ~ETH |
+> |-------|--------|------|
+> | $1,750 | $1,000 | 0.57 |
+> | $1,500 | $1,500 | 1.00 |
+> | $1,200 | $2,000 | 1.67 |
+> | $1,000 | $2,500 | 2.50 |
+
+---
+
+### Review all pending orders
+
+> **You:** How many pending limit orders do I have?
+
+The assistant fetches all pending orders and groups them by asset:
+
+> **Assistant:** You have **11 pending limit orders** — all buys:
+>
+> **SOL (4 orders) — $2,375 total**
+> | Rate | Amount | Units |
+> |------|--------|-------|
+> | $75 | $375 | 5 SOL |
+> | $70 | $500 | 7.14 SOL |
+> | $60 | $700 | 11.67 SOL |
+> | $50 | $800 | 16 SOL |
+>
+> **ETH (4 orders) — $7,000 total**
+> | Rate | Amount | Units |
+> |------|--------|-------|
+> | $1,750 | $1,000 | 0.57 ETH |
+> | $1,500 | $1,500 | 1.0 ETH |
+> | $1,200 | $2,000 | 1.67 ETH |
+> | $1,000 | $2,500 | 2.5 ETH |
+>
+> **SUI (3 orders) — $2,250 total**
+> | Rate | Amount | Units |
+> |------|--------|-------|
+> | $0.85 | $500 | 588 SUI |
+> | $0.75 | $750 | 1,000 SUI |
+> | $0.65 | $1,000 | 1,538 SUI |
+>
+> **Total capital committed**: $11,625 (you have $73,768 available credit)
+
+---
+
+### Portfolio analysis and average entry price
+
+> **You:** What's my average entry price on SOL including all my positions?
+
+The assistant fetches your full portfolio, filters SOL positions, and calculates:
+
+> **Assistant:** You have 27 SOL positions totaling **124.62 SOL** with an average entry of **$120.99**.
+>
+> Including your 4 pending limit orders (39.81 SOL), if all trigger your new average would be **$106.14** on 164.43 SOL.
+
+---
+
+### Market research and opinion
+
+> **You:** What do you think about SUI?
+
+The assistant combines portfolio data, chart analysis, and web research:
+
+> **Assistant:** SUI is trading at **$0.905**, down 75% from its October high of $3.70. Your 4 positions total 3,434 SUI at an average of $1.18 — currently -23%.
+>
+> **Key levels:** Support at $0.874 and $0.788 (flash crash low). Resistance at $1.00 and $1.10.
+>
+> **Catalysts:** SUI ETF applications under SEC review, SuiPlay0X1 gaming device launching Q3 2026. The $0.78-$0.85 zone is a strong accumulation area.
+
+---
+
+### Daily market check
+
+> **You:** Check the market related to my portfolio today and tell me if there is some macro news that could explain
+
+The assistant fetches live rates for all your holdings and searches for macro news:
+
+> **Assistant:**
+> | Asset | Price | Your Avg Entry | Status |
+> |-------|-------|----------------|--------|
+> | **BTC** | $66,455 | ~$68,500 | Underwater on recent buys |
+> | **ETH** | $1,948 | ~$2,114 | Recovering |
+> | **SOL** | $79.32 | ~$121 | -34% |
+> | **SUI** | $0.93 | ~$1.18 | -21% |
+> | **LINK** | $8.42 | ~$14.4 | -41% |
+>
+> **What's driving the selloff:**
+> 1. CPI report tomorrow — expected +0.3% MoM, still above Fed's 2% target
+> 2. Strong US economic data reinforcing "higher for longer" rate narrative
+> 3. BTC broke below 365-day moving average for first time since March 2022
+> 4. Mixed Spot Bitcoin ETF flows — no institutional conviction
+> 5. Global risk-off mode, total crypto market lost $43B in 24 hours
+
+---
+
+### Discover top traders
+
+> **You:** Find me the best performing popular investors this year
+
+The assistant uses the discovery tool with filters:
+
+> **Assistant:** Here are the top popular investors for the current year, sorted by gain...
+
+---
+
+### Manage watchlists
+
+> **You:** Create a watchlist called "AI Coins" and add SUI, NEAR, and TAO to it
+
+The assistant creates the watchlist and adds the instruments:
+
+> **Assistant:** Done! Created watchlist "AI Coins" and added:
+> - SUI (Sui) — ID 100340
+> - NEAR (Near Protocol) — ID 100337
+> - TAO (Bittensor) — ID 100418
+
+---
+
+### Quick price check
+
+> **You:** What's the current price of Bitcoin and Ethereum?
+
+> **Assistant:** Live rates:
+> - **BTC**: $68,503 (bid) / $68,520 (ask)
+> - **ETH**: $1,801 (bid) / $1,803 (ask)
+
 ## Setup
 
 ### 1. Build
@@ -123,96 +275,3 @@ After changing config, restart the server:
 | `get_user_trades` | Get trade history |
 | `get_user_portfolio` | Get public portfolio holdings |
 | `discover_users` | Discover popular investors (filterable) |
-
-## Conversation Examples
-
-Below are real examples of what you can do with an AI assistant connected to the eToro MCP server.
-
-### Place a limit order
-
-> **You:** Place a buy limit order for 5 SOL if it reaches $75
-
-The assistant searches for the Solana instrument, fetches the current rate, and places the order:
-
-> **Assistant:** Current SOL price is $78.21. I've placed a buy limit order for 5 SOL at $75 ($375 total) with a stop loss at $1. Order confirmed with token `cce5cf97-...`.
-
----
-
-### DCA ladder based on technical analysis
-
-> **You:** Can you place some DCA buy limit orders for ETH based on key support levels?
-
-The assistant analyzes daily/weekly candle data, identifies support zones, and asks for your budget:
-
-> **Assistant:** Based on the chart, here are the key support levels for ETH:
-> - $1,750 — first support zone
-> - $1,500 — strong horizontal support
-> - $1,200 — macro support
-> - $1,000 — psychological floor
->
-> I've placed 4 limit orders:
-> | Level | Amount | ~ETH |
-> |-------|--------|------|
-> | $1,750 | $1,000 | 0.57 |
-> | $1,500 | $1,500 | 1.00 |
-> | $1,200 | $2,000 | 1.67 |
-> | $1,000 | $2,500 | 2.50 |
-
----
-
-### Portfolio analysis and average entry price
-
-> **You:** What's my average entry price on SOL including all my positions?
-
-The assistant fetches your full portfolio, filters SOL positions, and calculates:
-
-> **Assistant:** You have 27 SOL positions totaling **124.62 SOL** with an average entry of **$120.99**.
->
-> Including your 4 pending limit orders (39.81 SOL), if all trigger your new average would be **$106.14** on 164.43 SOL.
-
----
-
-### Market research and opinion
-
-> **You:** What do you think about SUI?
-
-The assistant combines on-chain data with web research:
-
-> **Assistant:** SUI is trading at **$0.905**, down 75% from its October high of $3.70. Your 4 positions total 3,434 SUI at an average of $1.18 — currently -23%.
->
-> **Key levels:** Support at $0.874 and $0.788 (flash crash low). Resistance at $1.00 and $1.10.
->
-> **Catalysts:** SUI ETF applications under SEC review, SuiPlay0X1 gaming device launching Q3 2026. The $0.78-$0.85 zone is a strong accumulation area.
-
----
-
-### Discover top traders
-
-> **You:** Find me the best performing popular investors this year
-
-The assistant uses the discovery tool with filters:
-
-> **Assistant:** Here are the top popular investors for the current year, sorted by gain...
-
----
-
-### Manage watchlists
-
-> **You:** Create a watchlist called "AI Coins" and add SUI, NEAR, and TAO to it
-
-The assistant creates the watchlist and adds the instruments:
-
-> **Assistant:** Done! Created watchlist "AI Coins" and added:
-> - SUI (Sui) — ID 100340
-> - NEAR (Near Protocol) — ID 100337
-> - TAO (Bittensor) — ID 100418
-
----
-
-### Quick price check
-
-> **You:** What's the current price of Bitcoin and Ethereum?
-
-> **Assistant:** Live rates:
-> - **BTC**: $68,503 (bid) / $68,520 (ask)
-> - **ETH**: $1,801 (bid) / $1,803 (ask)
